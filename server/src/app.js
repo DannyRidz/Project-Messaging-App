@@ -2,6 +2,7 @@ import express from "express";
 import { pool } from "./db.js";
 import { AppError } from "./utils/AppError.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { authRouter } from "./routes/auth.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -22,6 +23,8 @@ app.get("/api/health", async (req, res) => {
     throw new AppError(503, "Database unavailable");
   }
 });
+
+app.use("/api/auth", authRouter);
 
 app.use((req, res, next) => {
   next(new AppError(404, "Route not found"));
