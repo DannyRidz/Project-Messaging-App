@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { matchedData } from "express-validator";
-import { findUserByEmail, findUserById } from "../models/user.js";
+import { findUserByEmail } from "../models/user.js";
 import { AppError } from "../utils/AppError.js";
 import {
   SESSION_COOKIE_NAME,
@@ -41,18 +41,8 @@ export async function login(req, res) {
   res.json({ user: publicUser });
 }
 
-export async function getCurrentUser(req, res) {
-  if (!req.session.userId) {
-    throw new AppError(401, "Please log in");
-  }
-
-  const user = await findUserById(req.session.userId);
-
-  if (!user) {
-    throw new AppError(401, "Please log in");
-  }
-
-  res.json({ user });
+export function getCurrentUser(req, res) {
+  res.json({ user: req.user });
 }
 
 export async function logout(req, res) {

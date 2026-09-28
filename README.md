@@ -172,3 +172,16 @@ Adding a friend does not automatically add the reverse relationship.
 - Reject messages that contain neither text nor an image.
 - Create a message and its attachment records together in a transaction.
 - Friendship does not control conversation membership.
+
+## Backend access policy
+
+- Registration and login are public.
+- Protected endpoints identify the account through the server-side session.
+- requireAuth attaches the authenticated account as req.user.
+- The current-account endpoint returns req.user.
+- Profile updates will use req.user.id to identify the account being edited.
+- Conversation access requires a matching conversation_members record.
+- requireConversationMember attaches the accessible conversation as req.conversation.
+- Inaccessible conversations return the same 404 response as missing conversations.
+- Message creation will use req.user.id as the sender.
+- Client-supplied account IDs do not determine the authenticated identity.
