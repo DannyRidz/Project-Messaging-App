@@ -46,3 +46,45 @@ A web app where users can exchange messages and customize their profiles.
 
 The app periodically requests new messages and friend activity.
 Online status means recently active, rather than guaranteed connected.
+
+## Screen navigation
+
+### Before login
+
+- Visitors start on the login screen.
+- The login screen links to sign up.
+- Successful registration takes the user to login.
+- Successful login takes the user to conversations.
+
+### After login
+
+- Conversations is the main screen.
+- Selecting a conversation opens its messages.
+- New chat opens a user-search dialog.
+- Selecting a user opens or creates a direct conversation.
+- Friends opens the friends screen.
+- Profile opens the profile editor.
+- Create group opens the group creation screen.
+- Creating a group opens the new group conversation.
+- Logging out returns the user to login.
+
+### Mobile layout
+
+- Show the conversation list and chat separately.
+- Selecting a conversation opens the chat.
+- A back button returns to the conversation list.
+
+## Feedback states
+
+- Show a loading message while fetching data.
+- Show a helpful empty state when a list has no items.
+- Show an error message when an operation fails.
+- Keep typed messages available if sending fails.
+- Disable repeated submission while a request is pending.
+
+## Friendship behavior
+
+Adding a friend adds that user to your personal friends list.
+Removing a friend removes them from your list.
+Friendship does not grant access to private conversations.
+Z
