@@ -1,5 +1,9 @@
 import { matchedData } from "express-validator";
-import { updateUserProfile, findPublicUserById } from "../models/user.js";
+import {
+  updateUserProfile,
+  findPublicUserById,
+  findUsers,
+} from "../models/user.js";
 import { AppError } from "../utils/AppError.js";
 
 export function getMyProfile(req, res) {
@@ -39,4 +43,14 @@ export async function getPublicProfile(req, res) {
   }
 
   res.json({ user });
+}
+
+export async function searchUsers(req, res) {
+  const { q = "" } = matchedData(req, {
+    locations: ["query"],
+  });
+
+  const users = await findUsers(req.user.id, q);
+
+  res.json({ users });
 }

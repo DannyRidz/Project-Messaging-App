@@ -101,3 +101,26 @@ export async function findPublicUserById(userId) {
 
   return result.rows[0];
 }
+
+export async function findUsers(currentUserId, searchTerm) {
+  const result = await pool.query(
+    `
+      SELECT
+        id,
+        username,
+        display_name AS "displayName",
+        bio
+      FROM users
+      WHERE id <> $1
+        AND (
+          STRPOS(LOWER(username), LOWER($2)) > 0
+          OR STRPOS(LOWER(display_name), LOWER($2)) > 0
+        )
+      ORDER BY username ASC
+      LIMIT 20
+    `,
+    [currentUserId, searchTerm],
+  );
+
+  return result.rows;
+}

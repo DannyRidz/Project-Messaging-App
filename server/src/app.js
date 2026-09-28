@@ -5,6 +5,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { sessionMiddleware } from "./middleware/session.js";
 import { authRouter } from "./routes/auth.js";
 import { usersRouter } from "./routes/users.js";
+import { conversationsRouter } from "./routes/conversations.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -29,6 +30,7 @@ app.get("/api/health", async (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/conversations", conversationsRouter);
 
 app.use((req, res, next) => {
   next(new AppError(404, "Route not found"));
