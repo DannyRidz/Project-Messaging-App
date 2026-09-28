@@ -23,3 +23,42 @@ export async function createUser({ username, email, passwordHash }) {
 
   return result.rows[0];
 }
+
+export async function findUserByEmail(email) {
+  const result = await pool.query(
+    `
+      SELECT
+        id,
+        username,
+        email,
+        password_hash AS "passwordHash",
+        display_name AS "displayName",
+        bio,
+        created_at AS "createdAt"
+      FROM users
+      WHERE email = $1
+    `,
+    [email],
+  );
+
+  return result.rows[0];
+}
+
+export async function findUserById(id) {
+  const result = await pool.query(
+    `
+      SELECT
+        id,
+        username,
+        email,
+        display_name AS "displayName",
+        bio,
+        created_at AS "createdAt"
+      FROM users
+      WHERE id = $1
+    `,
+    [id],
+  );
+
+  return result.rows[0];
+}

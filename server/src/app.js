@@ -2,12 +2,14 @@ import express from "express";
 import { pool } from "./db.js";
 import { AppError } from "./utils/AppError.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { sessionMiddleware } from "./middleware/session.js";
 import { authRouter } from "./routes/auth.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 
 app.use(express.json({ limit: "100kb" }));
+app.use(sessionMiddleware);
 
 app.get("/api/health", async (req, res) => {
   try {
