@@ -87,4 +87,88 @@ Online status means recently active, rather than guaranteed connected.
 Adding a friend adds that user to your personal friends list.
 Removing a friend removes them from your list.
 Friendship does not grant access to private conversations.
-Z
+
+## Database design
+
+### users
+
+Stores registered accounts.
+
+- id: primary key
+- username: required and unique
+- email: required and unique
+- password_hash: required
+- display_name: required
+- bio: optional
+- last_active_at: optional timestamp
+- created_at: required timestamp
+
+### conversations
+
+Stores direct and group conversations.
+
+- id: primary key
+- type: either direct or group
+- name: required for groups; absent for direct conversations
+- created_by: foreign key referencing users.id
+- created_at: required timestamp
+
+### conversation_members
+
+Connects users to conversations.
+
+- conversation_id: foreign key referencing conversations.id
+- user_id: foreign key referencing users.id
+- joined_at: required timestamp
+- Primary key: the combination of conversation_id and user_id
+
+### messages
+
+Stores messages within conversations.
+
+- id: primary key
+- conversation_id: foreign key referencing conversations.id
+- sender_id: foreign key referencing users.id
+- body: optional text
+- created_at: required timestamp
+
+A message must contain text, at least one image, or both.
+
+### message_attachments
+
+Stores metadata about images attached to messages.
+
+- id: primary key
+- message_id: foreign key referencing messages.id
+- storage_key: required identifier for the stored image
+- mime_type: required image content type
+- byte_size: required positive file size
+- created_at: required timestamp
+
+Image files live in file storage.
+The database stores information needed to locate and display them.
+
+### friendships
+
+Stores each user's personal friends list.
+
+- user_id: foreign key referencing users.id
+- friend_id: foreign key referencing users.id
+- created_at: required timestamp
+- Primary key: the combination of user_id and friend_id
+
+A user cannot add themselves as a friend.
+Adding a friend does not automatically add the reverse relationship.
+
+## Database and application rules
+
+- Normalize usernames and emails before storing and comparing them.
+- Store password hashes, never plaintext passwords.
+- A direct conversation has exactly two members.
+- Reuse an existing direct conversation between the same two users.
+- A group starts with its creator and at least one other user.
+- Only conversation members can read or send its messages.
+- Determine the message sender from the authenticated session.
+- Reject messages that contain neither text nor an image.
+- Create a message and its attachment records together in a transaction.
+- Friendship does not control conversation membership.
