@@ -1,10 +1,12 @@
 import express from "express";
 import { pool } from "./db.js";
+import { AppError } from "./utils/AppError.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 
 app.get("/api/health", async (req, res) => {
   try {
@@ -17,12 +19,15 @@ app.get("/api/health", async (req, res) => {
   } catch (error) {
     console.error("Database health check failed:", error.message);
 
-    res.status(503).json({
-      status: "error",
-      message: "Database unavailable",
-    });
+    throw new AppError(503, "Database unavailable");
   }
 });
+
+app.use((req, res, next) => {
+  next(new AppError(404, "Route not found"));
+});
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
