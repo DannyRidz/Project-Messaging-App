@@ -1,0 +1,19 @@
+# Installed JavaScript packages
+node_modules/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Generated frontend builds
+dist/
+
+# Test coverage reports
+coverage/
+
+# Log files
+*.log
+
+# macOS metadata
+.DS_Store
