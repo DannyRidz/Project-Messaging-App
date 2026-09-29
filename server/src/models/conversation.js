@@ -165,3 +165,63 @@ export async function getOrCreateDirectConversation(userId, recipientId) {
     client.release();
   }
 }
+
+export async function createGroupConversation(creatorId, name, memberIds) {
+  const client = await pool.connect();
+  const allMemberIds = [creatorId, ...memberIds];
+
+  try {
+    await client.query("BEGIN");
+
+    const existingUsers = await client.query(
+      `
+        SELECT COUNT(*)::integer AS total
+        FROM users
+        WHERE id = ANY($1::integer[])
+      `,
+      [allMemberIds],
+    );
+
+    if (existingUsers.rows[0].total !== allMemberIds.length) {
+      await client.query("ROLLBACK");
+      return null;
+    }
+
+    const inserted = await client.query(
+      `
+        INSERT INTO conversations (type, name, created_by)
+        VALUES ('group', $1, $2)
+        RETURNING
+          id,
+          type,
+          name,
+          created_by AS "createdBy",
+          created_at AS "createdAt"
+      `,
+      [name, creatorId],
+    );
+
+    const conversation = inserted.rows[0];
+
+    await client.query(
+      `
+        INSERT INTO conversation_members (conversation_id, user_id)
+        SELECT $1, UNNEST($2::integer[])
+      `,
+      [conversation.id, allMemberIds],
+    );
+
+    await client.query("COMMIT");
+    return conversation;
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    if (error.code === "23503") {
+      return null;
+    }
+
+    throw error;
+  } finally {
+    client.release();
+  }
+}

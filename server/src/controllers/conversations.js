@@ -3,6 +3,7 @@ import {
   listUserConversations,
   listConversationMembers,
   getOrCreateDirectConversation,
+  createGroupConversation,
 } from "../models/conversation.js";
 import { AppError } from "../utils/AppError.js";
 
@@ -43,6 +44,35 @@ export async function startDirectConversation(req, res) {
   res.status(result.created ? 201 : 200).json({
     conversation: {
       ...result.conversation,
+      members,
+    },
+  });
+}
+
+export async function startGroupConversation(req, res) {
+  const { name, memberIds } = matchedData(req, {
+    locations: ["body"],
+  });
+
+  if (memberIds.includes(req.user.id)) {
+    throw new AppError(400, "Do not include yourself in the selected users");
+  }
+
+  const conversation = await createGroupConversation(
+    req.user.id,
+    name,
+    memberIds,
+  );
+
+  if (!conversation) {
+    throw new AppError(404, "A selected account was not found");
+  }
+
+  const members = await listConversationMembers(conversation.id);
+
+  res.status(201).json({
+    conversation: {
+      ...conversation,
       members,
     },
   });

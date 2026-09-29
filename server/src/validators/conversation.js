@@ -18,3 +18,26 @@ export const directConversationRules = [
     )
     .withMessage("Recipient ID must be a positive integer"),
 ];
+
+export const groupConversationRules = [
+  body("name")
+    .isString()
+    .withMessage("Group name must be text")
+    .bail()
+    .trim()
+    .isLength({ min: 1, max: 60 })
+    .withMessage("Group name must contain 1 to 60 characters"),
+
+  body("memberIds")
+    .custom(
+      (value) =>
+        Array.isArray(value) &&
+        value.length >= 2 &&
+        value.length <= 9 &&
+        value.every(
+          (id) => Number.isInteger(id) && id > 0 && id <= 2147483647,
+        ) &&
+        new Set(value).size === value.length,
+    )
+    .withMessage("Choose 2 to 9 different users for the group"),
+];

@@ -21,6 +21,11 @@ export default function Conversations() {
   const [searchError, setSearchError] = useState(null);
   const [opening, setOpening] = useState(null);
 
+  const [selectedPeople, setSelectedPeople] = useState([]);
+  const [groupName, setGroupName] = useState("");
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [groupError, setGroupError] = useState(null);
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -111,6 +116,58 @@ export default function Conversations() {
     }
   }
 
+  function toggleGroupMember(person) {
+    setSelectedPeople((current) => {
+      if (current.some((member) => member.id === person.id)) {
+        return current.filter((member) => member.id !== person.id);
+      }
+
+      if (current.length >= 9) {
+        return current;
+      }
+
+      return [...current, person];
+    });
+
+    setGroupError(null);
+  }
+
+  async function handleCreateGroup(event) {
+    event.preventDefault();
+
+    if (creatingGroup) {
+      return;
+    }
+
+    if (selectedPeople.length < 2) {
+      setGroupError(new Error("Choose at least two other users"));
+      return;
+    }
+
+    setGroupError(null);
+    setCreatingGroup(true);
+
+    try {
+      const data = await api("/conversations/group", {
+        method: "POST",
+        body: {
+          name: groupName.trim(),
+          memberIds: selectedPeople.map((person) => person.id),
+        },
+      });
+
+      navigate(`/conversations/${data.conversation.id}`);
+    } catch (error) {
+      if (error.status === 401) {
+        setUser(null);
+      } else {
+        setGroupError(error);
+      }
+    } finally {
+      setCreatingGroup(false);
+    }
+  }
+
   return (
     <section>
       <h1>Conversations</h1>
@@ -140,7 +197,7 @@ export default function Conversations() {
       <h2>Start a conversation</h2>
 
       <form className="form" onSubmit={handleSearch}>
-        <fieldset disabled={searching || opening !== null}>
+        <fieldset disabled={searching || opening !== null || creatingGroup}>
           <legend>Find another user</legend>
 
           <label htmlFor="user-search">Username or display name</label>
@@ -171,18 +228,82 @@ export default function Conversations() {
               {person.bio && <p>{person.bio}</p>}
             </div>
 
-            <button
-              type="button"
-              onClick={() => startConversation(person.id)}
-              disabled={opening !== null || searching}
-            >
-              {opening === person.id
-                ? "Opening..."
-                : `Message ${person.username}`}
-            </button>
+            <div className="friend-actions">
+              <button
+                type="button"
+                onClick={() => startConversation(person.id)}
+                disabled={opening !== null || searching || creatingGroup}
+              >
+                {opening === person.id
+                  ? "Opening..."
+                  : `Message ${person.username}`}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleGroupMember(person)}
+                disabled={
+                  opening !== null ||
+                  searching ||
+                  creatingGroup ||
+                  (selectedPeople.length >= 9 &&
+                    !selectedPeople.some((member) => member.id === person.id))
+                }
+                aria-pressed={selectedPeople.some(
+                  (member) => member.id === person.id,
+                )}
+              >
+                {selectedPeople.some((member) => member.id === person.id)
+                  ? `Remove ${person.username} from group`
+                  : `Select ${person.username}`}
+              </button>
+            </div>
           </li>
         ))}
       </ul>
+
+      <h2>Create a group</h2>
+
+      <p>
+        Select 2 to 9 other users from the search results, then name your group.
+      </p>
+
+      {selectedPeople.length > 0 && (
+        <p>
+          Selected:{" "}
+          {selectedPeople.map((person) => person.displayName).join(", ")}
+        </p>
+      )}
+
+      <FormError error={groupError} />
+
+      <form className="form" onSubmit={handleCreateGroup}>
+        <fieldset disabled={creatingGroup || opening !== null || searching}>
+          <legend>Group details</legend>
+
+          <label htmlFor="group-name">Group name</label>
+          <input
+            id="group-name"
+            name="groupName"
+            type="text"
+            value={groupName}
+            onChange={(event) => setGroupName(event.target.value)}
+            maxLength={60}
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={
+              creatingGroup ||
+              selectedPeople.length < 2 ||
+              groupName.trim().length === 0
+            }
+          >
+            {creatingGroup ? "Creating group..." : "Create group"}
+          </button>
+        </fieldset>
+      </form>
     </section>
   );
 }

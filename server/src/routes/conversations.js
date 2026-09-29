@@ -4,6 +4,7 @@ import {
   getConversations,
   getConversation,
   startDirectConversation,
+  startGroupConversation,
 } from "../controllers/conversations.js";
 
 import {
@@ -12,7 +13,10 @@ import {
   sendImageMessage,
 } from "../controllers/messages.js";
 
-import { directConversationRules } from "../validators/conversation.js";
+import {
+  directConversationRules,
+  groupConversationRules,
+} from "../validators/conversation.js";
 
 import {
   messageQueryRules,
@@ -36,6 +40,13 @@ conversationsRouter.post(
   ...directConversationRules,
   validateRequest,
   startDirectConversation,
+);
+
+conversationsRouter.post(
+  "/group",
+  ...groupConversationRules,
+  validateRequest,
+  startGroupConversation,
 );
 
 conversationsRouter.get(

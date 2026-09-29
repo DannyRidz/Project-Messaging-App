@@ -235,6 +235,13 @@ function Chat({ conversationId }) {
 
       <h1>{conversationTitle(conversation, user.id)}</h1>
 
+      {conversation.type === "group" && (
+        <p>
+          Members:{" "}
+          {conversation.members.map((member) => member.displayName).join(", ")}
+        </p>
+      )}
+
       {pollError && (
         <div role="status">
           <p>
