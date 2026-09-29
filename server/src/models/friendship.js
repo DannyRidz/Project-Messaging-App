@@ -7,8 +7,13 @@ export async function listFriends(userId) {
         u.id,
         u.username,
         u.display_name AS "displayName",
-        u.bio,
-        f.created_at AS "addedAt"
+                u.bio,
+        f.created_at AS "addedAt",
+        u.last_active_at AS "lastActiveAt",
+        COALESCE(
+          u.last_active_at >= NOW() - INTERVAL '90 seconds',
+          false
+        ) AS "isOnline"
       FROM friendships AS f
       JOIN users AS u
         ON u.id = f.friend_id

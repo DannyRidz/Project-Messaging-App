@@ -241,3 +241,35 @@ textarea:focus-visible {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+.presence {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  font-weight: 600;
+}
+
+.presence::before {
+  content: "";
+  width: 0.65rem;
+  height: 0.65rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #64748b;
+}
+
+.presence[data-online="true"]::before {
+  background: #15803d;
+}
+
+.last-active {
+  font-size: 0.875rem;
+}
+
+.presence-warning {
+  margin: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #b45309;
+  border-radius: 0.5rem;
+}

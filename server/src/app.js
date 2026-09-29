@@ -8,6 +8,7 @@ import { usersRouter } from "./routes/users.js";
 import { conversationsRouter } from "./routes/conversations.js";
 import { attachmentsRouter } from "./routes/attachments.js";
 import { friendsRouter } from "./routes/friends.js";
+import { presenceRouter } from "./routes/presence.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -35,6 +36,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/conversations", conversationsRouter);
 app.use("/api/attachments", attachmentsRouter);
+app.use("/api/presence", presenceRouter);
 
 app.use((req, res, next) => {
   next(new AppError(404, "Route not found"));

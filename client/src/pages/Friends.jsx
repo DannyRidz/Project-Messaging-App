@@ -27,6 +27,7 @@ export default function Friends() {
 
   useEffect(() => {
     const controller = new AbortController();
+    let timer;
 
     async function loadFriends() {
       try {
@@ -36,9 +37,10 @@ export default function Friends() {
 
         if (!controller.signal.aborted) {
           setFriends(data.friends);
+          setListError(null);
         }
       } catch (error) {
-        if (error.name === "AbortError") {
+        if (controller.signal.aborted) {
           return;
         }
 
@@ -50,6 +52,7 @@ export default function Friends() {
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
+          timer = window.setTimeout(loadFriends, 10000);
         }
       }
     }
@@ -58,6 +61,7 @@ export default function Friends() {
 
     return () => {
       controller.abort();
+      window.clearTimeout(timer);
     };
   }, [refreshKey, setUser]);
 
@@ -117,6 +121,7 @@ export default function Friends() {
         );
 
         setNotice(`${person.displayName} was removed from your list.`);
+        refreshFriends();
       } else if (action === "message") {
         const data = await api("/conversations/direct", {
           method: "POST",
@@ -141,6 +146,10 @@ export default function Friends() {
       <h1>Friends</h1>
 
       <p>Save people to your personal friends list.</p>
+      <p>
+        Online means activity was received within the last 90 seconds. Statuses
+        refresh automatically.
+      </p>
 
       <button
         type="button"
@@ -156,7 +165,7 @@ export default function Friends() {
       {notice && <p role="status">{notice}</p>}
 
       {!loading &&
-        !listError &&
+        (friends.length > 0 || !listError) &&
         (friends.length === 0 ? (
           <p>Your friends list is empty.</p>
         ) : (
@@ -167,6 +176,23 @@ export default function Friends() {
                   <strong>{friend.displayName}</strong>
                   <span> @{friend.username}</span>
                   {friend.bio && <p>{friend.bio}</p>}
+                  <p
+                    className="presence"
+                    data-online={!listError && friend.isOnline}
+                  >
+                    {listError
+                      ? "Status unavailable"
+                      : friend.isOnline
+                        ? "Online"
+                        : "Offline"}
+                  </p>
+
+                  {!listError && !friend.isOnline && friend.lastActiveAt && (
+                    <p className="last-active">
+                      Last active:{" "}
+                      {new Date(friend.lastActiveAt).toLocaleString()}
+                    </p>
+                  )}
                 </div>
 
                 <div className="friend-actions">
