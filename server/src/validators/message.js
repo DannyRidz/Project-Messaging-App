@@ -41,3 +41,14 @@ export const messageQueryRules = [
     .bail()
     .toInt(),
 ];
+
+export const imageMessageRules = [
+  body("body")
+    .optional()
+    .isString()
+    .withMessage("Caption must be text")
+    .bail()
+    .trim()
+    .isLength({ max: 4000 })
+    .withMessage("Caption must contain at most 4000 characters"),
+];

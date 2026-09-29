@@ -1,10 +1,16 @@
 export async function api(path, { method = "GET", body, signal } = {}) {
+  const multipart = body instanceof FormData;
+
   const response = await fetch(`/api${path}`, {
     method,
     credentials: "same-origin",
     signal,
-    headers: body === undefined ? {} : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    headers:
+      body === undefined || multipart
+        ? {}
+        : { "Content-Type": "application/json" },
+    body:
+      body === undefined ? undefined : multipart ? body : JSON.stringify(body),
   });
 
   const data = response.status === 204 ? null : await response.json();

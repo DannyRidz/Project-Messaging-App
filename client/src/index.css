@@ -141,3 +141,97 @@ textarea:focus-visible {
   color: #8a1c13;
   background: #fff1f0;
 }
+
+.conversation-list,
+.people-list,
+.message-list {
+  padding: 0;
+  list-style: none;
+}
+
+.conversation-list li {
+  margin: 0.75rem 0;
+}
+
+.conversation-list a {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #d7deea;
+  border-radius: 0.5rem;
+  color: #243b75;
+}
+
+.people-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #d7deea;
+  border-radius: 0.5rem;
+}
+
+.people-list p {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.message {
+  align-self: flex-start;
+  width: min(100%, 38rem);
+  padding: 1rem;
+  border: 1px solid #d7deea;
+  border-radius: 0.75rem;
+  background: #f4f6fa;
+}
+
+.own-message {
+  align-self: flex-end;
+  border-color: #b6c8f4;
+  background: #eaf0ff;
+}
+
+.message-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.message-meta time {
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.message-body {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message-image-link {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.message-image {
+  display: block;
+  max-width: 100%;
+  max-height: 30rem;
+  width: auto;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.form input[type="file"] {
+  overflow-wrap: anywhere;
+}

@@ -1,6 +1,12 @@
+import { randomUUID } from "node:crypto";
 import { pool } from "../db.js";
 
-export async function createMessage(conversationId, senderId, body) {
+export async function createMessage(
+  conversationId,
+  senderId,
+  body,
+  attachment = null,
+) {
   const client = await pool.connect();
 
   try {
@@ -42,9 +48,47 @@ export async function createMessage(conversationId, senderId, body) {
       [conversationId, senderId, body],
     );
 
+    const message = result.rows[0];
+    message.attachments = [];
+
+    if (attachment) {
+      const attachmentResult = await client.query(
+        `
+          INSERT INTO message_attachments (
+            message_id,
+            storage_key,
+            mime_type,
+            byte_size,
+            data
+          )
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING
+            id,
+            mime_type AS "mimeType",
+            byte_size AS "byteSize"
+        `,
+        [
+          message.id,
+          randomUUID(),
+          attachment.mimeType,
+          attachment.data.length,
+          attachment.data,
+        ],
+      );
+
+      const savedAttachment = attachmentResult.rows[0];
+
+      message.attachments = [
+        {
+          ...savedAttachment,
+          url: `/api/attachments/${savedAttachment.id}`,
+        },
+      ];
+    }
+
     await client.query("COMMIT");
 
-    return result.rows[0];
+    return message;
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -84,7 +128,22 @@ export async function listMessages(
           'username', u.username,
           'displayName', u.display_name
         ) AS sender,
-        '[]'::json AS attachments
+        COALESCE(
+          (
+            SELECT JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'id', a.id,
+                'mimeType', a.mime_type,
+                'byteSize', a.byte_size,
+                'url', '/api/attachments/' || a.id
+              )
+              ORDER BY a.id
+            )
+            FROM message_attachments AS a
+            WHERE a.message_id = m.id
+          ),
+          '[]'::json
+        ) AS attachments
       FROM messages AS m
       JOIN users AS u
         ON u.id = m.sender_id

@@ -12,6 +12,9 @@ import Profile from "./pages/Profile.jsx";
 
 import { api } from "./lib/api.js";
 
+import Conversations from "./pages/Conversations.jsx";
+import Conversation from "./pages/Conversation.jsx";
+
 function Page({ title, description }) {
   return (
     <section>
@@ -104,10 +107,16 @@ export default function App() {
             path="/conversations"
             element={
               <RequireAuth>
-                <Page
-                  title="Conversations"
-                  description="Your conversation list will go here."
-                />
+                <Conversations />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/conversations/:conversationId"
+            element={
+              <RequireAuth>
+                <Conversation />
               </RequireAuth>
             }
           />

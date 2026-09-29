@@ -43,7 +43,12 @@ CREATE TABLE message_attachments (
   storage_key TEXT NOT NULL,
   mime_type TEXT NOT NULL,
   byte_size INTEGER NOT NULL CHECK (byte_size > 0),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  data BYTEA NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT attachment_data_size CHECK (
+    octet_length(data) = byte_size
+    AND byte_size <= 2097152
+  )
 );
 
 CREATE TABLE friendships (

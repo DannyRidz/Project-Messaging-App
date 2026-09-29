@@ -6,15 +6,24 @@ import {
   startDirectConversation,
 } from "../controllers/conversations.js";
 
-import { getMessages, sendMessage } from "../controllers/messages.js";
+import {
+  getMessages,
+  sendMessage,
+  sendImageMessage,
+} from "../controllers/messages.js";
 
 import { directConversationRules } from "../validators/conversation.js";
 
-import { messageQueryRules, sendMessageRules } from "../validators/message.js";
+import {
+  messageQueryRules,
+  sendMessageRules,
+  imageMessageRules,
+} from "../validators/message.js";
 
 import { requireAuth } from "../middleware/requireAuth.js";
 import { requireConversationMember } from "../middleware/requireConversationMember.js";
 import { validateRequest } from "../middleware/validateRequest.js";
+import { uploadImage } from "../middleware/uploadImage.js";
 
 export const conversationsRouter = Router();
 
@@ -43,6 +52,15 @@ conversationsRouter.post(
   ...sendMessageRules,
   validateRequest,
   sendMessage,
+);
+
+conversationsRouter.post(
+  "/:conversationId/images",
+  requireConversationMember,
+  uploadImage,
+  ...imageMessageRules,
+  validateRequest,
+  sendImageMessage,
 );
 
 conversationsRouter.get(

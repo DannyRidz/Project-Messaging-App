@@ -1,6 +1,7 @@
 import { matchedData } from "express-validator";
 import { createMessage, listMessages } from "../models/message.js";
 import { AppError } from "../utils/AppError.js";
+import { normalizeImage } from "../utils/normalizeImage.js";
 
 export async function sendMessage(req, res) {
   const { body } = matchedData(req, {
@@ -46,4 +47,38 @@ export async function getMessages(req, res) {
   });
 
   res.json(result);
+}
+
+export async function sendImageMessage(req, res) {
+  if (!req.file) {
+    throw new AppError(400, "Choose an image to upload");
+  }
+
+  const { body = "" } = matchedData(req, {
+    locations: ["body"],
+  });
+
+  const attachment = await normalizeImage(req.file.buffer);
+
+  const message = await createMessage(
+    req.conversation.id,
+    req.user.id,
+    body,
+    attachment,
+  );
+
+  if (!message) {
+    throw new AppError(404, "Conversation not found");
+  }
+
+  res.status(201).json({
+    message: {
+      ...message,
+      sender: {
+        id: req.user.id,
+        username: req.user.username,
+        displayName: req.user.displayName,
+      },
+    },
+  });
 }
