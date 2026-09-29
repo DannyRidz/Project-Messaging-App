@@ -61,3 +61,83 @@ a:focus-visible {
 h1 {
   margin-top: 0;
 }
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #294bb0;
+  border-radius: 0.375rem;
+  color: white;
+  background: #294bb0;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #bd5900;
+  outline-offset: 3px;
+}
+
+.form {
+  max-width: 32rem;
+}
+
+.form fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid #d7deea;
+  border-radius: 0.5rem;
+}
+
+.form legend {
+  padding: 0 0.25rem;
+  font-weight: 600;
+}
+
+.form label {
+  font-weight: 600;
+}
+
+.form input,
+.form textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid #7b879b;
+  border-radius: 0.375rem;
+  color: inherit;
+  background: white;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.form-error {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #b42318;
+  border-radius: 0.375rem;
+  color: #8a1c13;
+  background: #fff1f0;
+}

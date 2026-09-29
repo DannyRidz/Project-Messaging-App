@@ -1,5 +1,16 @@
-import { NavLink, Route, Routes } from "react-router";
+import { useContext, useState } from "react";
+import { NavLink, Route, Routes, useNavigate } from "react-router";
+
+import { AuthContext } from "./context/AuthContext.js";
+import RequireAuth from "./components/RequireAuth.jsx";
+import FormError from "./components/FormError.jsx";
+
 import Home from "./pages/Home.jsx";
+import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
+import Profile from "./pages/Profile.jsx";
+
+import { api } from "./lib/api.js";
 
 function Page({ title, description }) {
   return (
@@ -11,64 +22,93 @@ function Page({ title, description }) {
 }
 
 export default function App() {
+  const { user, setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [logoutError, setLogoutError] = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setLogoutError(null);
+    setLoggingOut(true);
+
+    try {
+      await api("/auth/logout", {
+        method: "POST",
+      });
+
+      setUser(null);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      setLogoutError(error);
+    } finally {
+      setLoggingOut(false);
+    }
+  }
+
   return (
     <>
       <header className="site-header">
         <span className="brand">Messaging App</span>
+
+        {user && <p>Signed in as {user.displayName}</p>}
 
         <nav aria-label="Main navigation">
           <NavLink to="/" end>
             Home
           </NavLink>
 
-          <NavLink to="/register">Register</NavLink>
+          {user ? (
+            <>
+              <NavLink to="/profile">Profile</NavLink>
 
-          <NavLink to="/login">Log in</NavLink>
+              <NavLink to="/conversations">Conversations</NavLink>
 
-          <NavLink to="/profile">Profile</NavLink>
-
-          <NavLink to="/conversations">Conversations</NavLink>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+              >
+                {loggingOut ? "Logging out..." : "Log out"}
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/register">Register</NavLink>
+              <NavLink to="/login">Log in</NavLink>
+            </>
+          )}
         </nav>
+
+        <FormError error={logoutError} />
       </header>
 
       <main className="page">
         <Routes>
           <Route path="/" element={<Home />} />
 
-          <Route
-            path="/register"
-            element={
-              <Page
-                title="Register"
-                description="The registration form will go here."
-              />
-            }
-          />
+          <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/login"
-            element={
-              <Page title="Log in" description="The login form will go here." />
-            }
-          />
+          <Route path="/login" element={<Login />} />
 
           <Route
             path="/profile"
             element={
-              <Page
-                title="Profile"
-                description="Your profile editor will go here."
-              />
+              <RequireAuth>
+                <Profile />
+              </RequireAuth>
             }
           />
 
           <Route
             path="/conversations"
             element={
-              <Page
-                title="Conversations"
-                description="Your conversation list will go here."
-              />
+              <RequireAuth>
+                <Page
+                  title="Conversations"
+                  description="Your conversation list will go here."
+                />
+              </RequireAuth>
             }
           />
 
