@@ -235,3 +235,9 @@ textarea:focus-visible {
 .form input[type="file"] {
   overflow-wrap: anywhere;
 }
+
+.friend-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

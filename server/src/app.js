@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.js";
 import { usersRouter } from "./routes/users.js";
 import { conversationsRouter } from "./routes/conversations.js";
 import { attachmentsRouter } from "./routes/attachments.js";
+import { friendsRouter } from "./routes/friends.js";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -29,6 +30,7 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
+app.use("/api/friends", friendsRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/conversations", conversationsRouter);

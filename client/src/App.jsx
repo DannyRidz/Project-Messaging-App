@@ -15,6 +15,8 @@ import { api } from "./lib/api.js";
 import Conversations from "./pages/Conversations.jsx";
 import Conversation from "./pages/Conversation.jsx";
 
+import Friends from "./pages/Friends.jsx";
+
 function Page({ title, description }) {
   return (
     <section>
@@ -66,6 +68,8 @@ export default function App() {
               <NavLink to="/profile">Profile</NavLink>
 
               <NavLink to="/conversations">Conversations</NavLink>
+
+              <NavLink to="/friends">Friends</NavLink>
 
               <button
                 type="button"
@@ -128,6 +132,15 @@ export default function App() {
                 title="Page not found"
                 description="Choose a page from the navigation."
               />
+            }
+          />
+
+          <Route
+            path="/friends"
+            element={
+              <RequireAuth>
+                <Friends />
+              </RequireAuth>
             }
           />
         </Routes>
