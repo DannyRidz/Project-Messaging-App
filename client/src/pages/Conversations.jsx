@@ -12,6 +12,7 @@ export default function Conversations() {
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [listError, setListError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -37,6 +38,7 @@ export default function Conversations() {
 
         if (!controller.signal.aborted) {
           setConversations(data.conversations);
+          setListError(null);
         }
       } catch (error) {
         if (error.name === "AbortError") {
@@ -51,6 +53,7 @@ export default function Conversations() {
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
+          setRefreshing(false);
         }
       }
     }
@@ -63,7 +66,7 @@ export default function Conversations() {
   }, [refreshKey, setUser]);
 
   function refreshConversations() {
-    setLoading(true);
+    setRefreshing(true);
     setListError(null);
     setRefreshKey((current) => current + 1);
   }
@@ -172,14 +175,22 @@ export default function Conversations() {
     <section>
       <h1>Conversations</h1>
 
-      <button type="button" onClick={refreshConversations} disabled={loading}>
-        {loading ? "Loading..." : "Refresh conversations"}
+      <button
+        type="button"
+        onClick={refreshConversations}
+        disabled={loading || refreshing}
+      >
+        {loading
+          ? "Loading..."
+          : refreshing
+            ? "Refreshing..."
+            : "Refresh conversations"}
       </button>
 
       <FormError error={listError} />
 
       {!loading &&
-        !listError &&
+        (conversations.length > 0 || !listError) &&
         (conversations.length === 0 ? (
           <p>You have no conversations yet.</p>
         ) : (
@@ -269,7 +280,7 @@ export default function Conversations() {
       </p>
 
       {selectedPeople.length > 0 && (
-        <p>
+        <p role="status">
           Selected:{" "}
           {selectedPeople.map((person) => person.displayName).join(", ")}
         </p>

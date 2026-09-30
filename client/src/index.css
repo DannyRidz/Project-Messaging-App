@@ -273,3 +273,33 @@ textarea:focus-visible {
   border: 1px solid #b45309;
   border-radius: 0.5rem;
 }
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.375rem;
+  color: white;
+  background: #294bb0;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid #bd5900;
+  outline-offset: 2px;
+}
+
+.page:focus {
+  outline: 3px solid #bd5900;
+  outline-offset: 3px;
+}
+
+.page h1,
+.conversation-list a,
+.people-list strong,
+.site-header p {
+  overflow-wrap: anywhere;
+}

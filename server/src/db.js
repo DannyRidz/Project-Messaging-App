@@ -3,7 +3,8 @@ import pg from "pg";
 const { Pool } = pg;
 
 export const pool = new Pool({
-  connectionTimeoutMillis: 5000,
+  connectionString: process.env.DATABASE_URL || undefined,
+  connectionTimeoutMillis: 15000,
 });
 
 pool.on("error", (error) => {

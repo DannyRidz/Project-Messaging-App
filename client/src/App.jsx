@@ -53,6 +53,9 @@ export default function App() {
 
   return (
     <>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <header className="site-header">
         <span className="brand">Messaging App</span>
 
@@ -90,7 +93,7 @@ export default function App() {
         <FormError error={logoutError} />
       </header>
 
-      <main className="page">
+      <main id="main-content" className="page" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
 
