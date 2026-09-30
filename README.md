@@ -2,6 +2,8 @@
 
 A web app where users can exchange messages and customize their profiles.
 
+[Live app](https://messaging-app-iag2.onrender.com/) · [Source code](https://github.com/DannyRidz/Project-Messaging-App)
+
 ## Core features
 
 - Create an account.
